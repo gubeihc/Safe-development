@@ -1,0 +1,100 @@
+// ==UserScript==
+// @name        自动输入简单验证码
+// @namespace   Violentmonkey Scripts
+// @match       *://*/*
+// @grant        GM_xmlhttpRequest
+// @version     1.0
+// @author      顾北
+// @description 2021/7/2下午4:08:51
+// ==/UserScript==
+
+//这里是填写验证码
+function yzm(s){
+  let form = document.getElementsByTagName('input');
+for (let i = 0; i < form.length; i++) {
+if (form[i].type == 'password'){
+    
+    c = i+1
+    form[c].value = s
+       console.log("写入验证码");
+
+  }
+};
+ 
+}
+
+function sleep (time) {
+ return new Promise((resolve) => setTimeout(resolve, time));
+} 
+
+
+function checkPictureName(str)
+        {
+            var strRegex = "(.jpg|.png|.jpeg|.gif|.ico|.svg|==)$"; //用于验证图片扩展名的正则表达式
+            var re= new RegExp(strRegex);
+            if (re.test(str.toLowerCase())){
+              return "s"
+            
+            } else{
+                return str;
+            }
+        }
+
+
+
+
+sleep(700).then(() => {
+  var img="";
+var arrImg = document.images;
+for (let i = 0; i < arrImg.length; i++){
+  let url=arrImg[i].src
+
+  let ss=checkPictureName(url)
+  
+  if (ss =="s"){
+    
+  } else{
+    
+          img = ss
+
+  }
+}
+var dd = document.images;
+for (let i = 0; i < dd.length; i++){
+
+                        if (dd[i].src.includes(img)) { 
+                            console.log("获取唯一验证码链接成功");
+                         dd[i].setAttribute("crossOrigin",'Anonymous');// 设置允许跨域
+                          img = dd[i];
+                          img.onload = function(){
+                              var canvas = document.createElement("canvas");
+                          canvas.width = img.width;
+                          canvas.height = img.height;
+                          var ctx = canvas.getContext("2d");
+                          ctx.drawImage(img, 0, 0, img.width, img.height);
+                          var dataURL = canvas.toDataURL("image/png");     
+                            // var ss= dataURL
+
+                          console.log(dataURL)
+
+//这里就是发送到本地api 接口的代码，如果需要对接打码按照类似的格式修改
+    GM_xmlhttpRequest({
+             url: 'http://127.0.0.1:9999/api',
+             method: 'POST',
+             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+              data:'url='+dataURL,
+             responseType: "text",
+             onload: obj => {
+                 var data=obj.responseText;
+               yzm(data)
+                console.log(data);
+
+                 
+                }
+             })
+                          }
+                         
+                            }
+                        };
+
+ } )
