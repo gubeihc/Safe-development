@@ -11,8 +11,7 @@ ocr = ddddocr.DdddOcr(show_ad=False)
 
 
 @app.route('/api', methods=['POST'])
-def api(port):
-    app.run(host='0.0.0.0', port=int(port))
+def api():
     try:
         url = request.form.get('url')
         data = url.replace(' ', '+')
@@ -25,5 +24,7 @@ def api(port):
 
 
 if __name__ == '__main__':
-    api(9999)
+    api()
+    app.run(host='0.0.0.0', port=9999)
+
 
